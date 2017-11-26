@@ -95,7 +95,7 @@ public class Server {
           pw.println("HTTP1.0 500 Internal Server Error");
           pw.println("Content-Type: text/html");
           pw.println();
-          pw.println("505 Internal Server Error");
+          pw.println("500 Internal Server Error");
         }
       }
     } catch (IOException e) {
