@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -123,16 +124,15 @@ public class Context {
   }
 
   private static void injectInternal(Object instance) {
-    for(Field field : instance.getClass().getDeclaredFields()) {
-      if(!field.isAnnotationPresent(Injection.class)) {
-        continue;
-      }
-      field.setAccessible(true);
-      try {
-        field.set(instance, getBean(field.getType()));
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-    }
+    Arrays.stream(instance.getClass().getDeclaredFields())
+            .filter(f -> f.isAnnotationPresent(Injection.class))
+            .forEach(f -> {
+              f.setAccessible(true);
+              try {
+                f.set(instance, getBean(f.getType()));
+              } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+              }
+            });
   }
 }
