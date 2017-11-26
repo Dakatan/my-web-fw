@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class Context {
   private static final Map<String, Class<?>> typeMap = new HashMap<>();
-  private static final Map<Class<?>, Object> beanMap = new HashMap<>();
+  private static final Map<Class<?>, Object> instanceMap = new HashMap<>();
 
   static {
     autoRegister();
@@ -24,7 +24,7 @@ public class Context {
   }
 
   public static Collection<Class<?>> getRegisteredBeanTypes() {
-    return beanMap.keySet();
+    return instanceMap.keySet();
   }
 
   public static Object getBean(String name) {
@@ -32,13 +32,13 @@ public class Context {
     if(clazz == null) {
       throw new NullPointerException("Class is null.");
     }
-    Object cache = beanMap.get(clazz);
-    if(cache != null) {
-      return cache;
+    Object cachedInstance = instanceMap.get(clazz);
+    if(cachedInstance != null) {
+      return cachedInstance;
     }
     try {
       Object instance = clazz.newInstance();
-      beanMap.put(clazz, instance);
+      instanceMap.put(clazz, instance);
       return instance;
     } catch (InstantiationException | IllegalAccessException e) {
       throw new RuntimeException(e);
@@ -47,7 +47,7 @@ public class Context {
 
   @SuppressWarnings("unchecked")
   public static <T> T getBean(Class<T> clazz) {
-    Object instance = beanMap.get(clazz);
+    Object instance = instanceMap.get(clazz);
     if(instance != null) {
       return (T) instance;
     }
@@ -58,19 +58,19 @@ public class Context {
     if(name == null || clazz == null) {
       throw new RuntimeException("name or class is null.");
     }
-    if(typeMap.containsKey(name) || beanMap.containsKey(clazz)) {
-      throw new RuntimeException("bean already registered.");
+    if(typeMap.containsKey(name) || instanceMap.containsKey(clazz)) {
+      throw new RuntimeException("instance already registered.");
     }
 
-    Object bean;
+    Object instance;
     try {
-      bean = clazz.newInstance();
+      instance = clazz.newInstance();
     } catch (InstantiationException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
 
     typeMap.put(name, clazz);
-    beanMap.put(clazz, bean);
+    instanceMap.put(clazz, instance);
   }
 
   private static void register(Class<?> clazz) {
@@ -117,7 +117,7 @@ public class Context {
   }
 
   private static void autoInjection() {
-    for(Class<?> clazz : beanMap.keySet()) {
+    for(Class<?> clazz : instanceMap.keySet()) {
       inject(clazz);
     }
   }
