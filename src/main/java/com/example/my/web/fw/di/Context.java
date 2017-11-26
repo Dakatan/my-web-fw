@@ -18,7 +18,7 @@ public class Context {
   private static final Map<String, Class<?>> typeMap = new HashMap<>();
   private static final Map<Class<?>, Object> beanMap = new HashMap<>();
 
-  public static void init() {
+  static {
     autoRegister();
     autoInjection();
   }

@@ -7,7 +7,6 @@ public class ContextTest {
 
   @Test
   public void test1() {
-    Context.init();
     SampleController controller = Context.getBean(SampleController.class);
     String str = controller.doService();
     System.out.println(str);
