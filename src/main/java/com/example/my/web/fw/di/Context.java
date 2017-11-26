@@ -86,7 +86,6 @@ public class Context {
     Path classPath;
     try {
        classPath = new File(url.toURI()).toPath().resolve("../../../../../../..");
-       System.out.println(classPath);
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }

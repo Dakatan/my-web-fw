@@ -1,6 +1,6 @@
 package com.example.my.web.fw.server;
 
-import com.example.my.web.fw.annotation.Path;
+import com.example.my.web.fw.annotation.RequestPath;
 import com.example.my.web.fw.di.Context;
 
 import java.io.BufferedReader;
@@ -32,14 +32,13 @@ public class Server {
 
   public Server(int port) {
     this.port = port;
-    Context.getRegisteredBeanTypes().stream()
-            .filter(c -> c.isAnnotationPresent(Path.class))
-            .forEach(c -> {
-              String rootPath = c.getAnnotation(Path.class).value();
+    Context.getRegisteredBeanTypes().forEach(c -> {
+              RequestPath pathAnnotation = c.getAnnotation(RequestPath.class);
+              String rootPath = pathAnnotation == null ? "" : pathAnnotation.value();
               Arrays.stream(c.getMethods())
-                      .filter(m -> m.isAnnotationPresent(Path.class))
+                      .filter(m -> m.isAnnotationPresent(RequestPath.class))
                       .forEach(m -> {
-                        String path = rootPath + "/" + m.getAnnotation(Path.class).value();
+                        String path = rootPath + "/" + m.getAnnotation(RequestPath.class).value();
                         handleMap.put(path, new HandleMethod(c, m));
                       });
             });
@@ -53,7 +52,7 @@ public class Server {
     try {
       serverSocket = new ServerSocket(port);
     } catch (IOException e) {
-      stop();
+      status = Status.STOPPING;
       throw new RuntimeException(e);
     }
     while (status == Status.RUNNING) {
