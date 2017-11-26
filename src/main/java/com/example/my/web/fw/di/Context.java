@@ -23,6 +23,10 @@ public class Context {
     autoInjection();
   }
 
+  public static Collection<Class<?>> getRegisteredBeanTypes() {
+    return beanMap.keySet();
+  }
+
   public static Object getBean(String name) {
     Class<?> clazz = typeMap.get(name);
     if(clazz == null) {
@@ -50,7 +54,7 @@ public class Context {
     return (T) getBean(clazz.getName());
   }
 
-  public static void register(String name, Class<?> clazz) {
+  private static void register(String name, Class<?> clazz) {
     if(name == null || clazz == null) {
       throw new RuntimeException("name or class is null.");
     }
@@ -69,7 +73,7 @@ public class Context {
     beanMap.put(clazz, bean);
   }
 
-  public static void register(Class<?> clazz) {
+  private static void register(Class<?> clazz) {
     if(clazz == null) {
       throw new NullPointerException("clazz is null");
     }
@@ -77,11 +81,12 @@ public class Context {
     register(className.substring(0, 1).toLowerCase() + className.substring(1), clazz);
   }
 
-  public static void autoRegister() {
+  private static void autoRegister() {
     URL url = Context.class.getResource("/" + Context.class.getName().replace(".", "/") + ".class");
     Path classPath;
     try {
        classPath = new File(url.toURI()).toPath().resolve("../../../../../../..");
+       System.out.println(classPath);
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
@@ -107,19 +112,15 @@ public class Context {
     }
   }
 
-  public static void inject(Class<?> clazz) {
+  private static void inject(Class<?> clazz) {
     Object instance = getBean(clazz);
     injectInternal(instance);
   }
 
-  public static void autoInjection() {
+  private static void autoInjection() {
     for(Class<?> clazz : beanMap.keySet()) {
       inject(clazz);
     }
-  }
-
-  public static Collection<Class<?>> getRegisteredBeanTypes() {
-    return beanMap.keySet();
   }
 
   private static void injectInternal(Object instance) {
