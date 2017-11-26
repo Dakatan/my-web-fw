@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-  private static final int DEFAULT_PORT = 8080;
+  private static final int DEFAULT_PORT = 9999;
   private static final int DEFAULT_THREAD_POOL_SIZE = 10;
   private final int port;
   private final Map<String, HandleMethod> handleMap = new HashMap<>();
