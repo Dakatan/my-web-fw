@@ -22,7 +22,8 @@ public class Server {
   private final int port;
   private final Map<String, HandleMethod> handleMap = new HashMap<>();
   private ServerSocket serverSocket;
-  private ExecutorService executor = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
+  private ExecutorService requestExecutor = Executors.newFixedThreadPool(DEFAULT_THREAD_POOL_SIZE);
+  private ExecutorService serviceExecutor = Executors.newFixedThreadPool(1);
   private Status status = Status.STOPPING;
   private enum Status {RUNNING, STOPPING}
 
@@ -55,15 +56,17 @@ public class Server {
       status = Status.STOPPING;
       throw new RuntimeException(e);
     }
-    while (status == Status.RUNNING) {
-      try {
-        Socket socket = serverSocket.accept();
-        executor.submit(() -> handle(socket));
-      } catch (Exception e) {
-        stop();
-        throw new RuntimeException(e);
+    serviceExecutor.submit(() -> {
+      while (status == Status.RUNNING) {
+        try {
+          Socket socket = serverSocket.accept();
+          requestExecutor.submit(() -> handle(socket));
+        } catch (Exception e) {
+          stop();
+          throw new RuntimeException(e);
+        }
       }
-    }
+    });
   }
 
   public void stop() {
