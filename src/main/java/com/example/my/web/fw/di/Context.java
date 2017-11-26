@@ -118,18 +118,6 @@ public class Context {
     }
   }
 
-  public static <T> T newInstance(Class<T> clazz) {
-    T instance;
-
-    try {
-      instance = clazz.newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-    injectInternal(instance);
-    return instance;
-  }
-
   public static Collection<Class<?>> getRegisteredBeanTypes() {
     return beanMap.keySet();
   }
