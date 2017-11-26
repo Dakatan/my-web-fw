@@ -29,16 +29,15 @@ public class Context {
       throw new NullPointerException("Class is null.");
     }
     Object cache = beanMap.get(clazz);
-    if(cache == null) {
-      try {
-        Object instance = clazz.newInstance();
-        beanMap.put(clazz, instance);
-        return instance;
-      } catch (InstantiationException | IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-    } else {
+    if(cache != null) {
       return cache;
+    }
+    try {
+      Object instance = clazz.newInstance();
+      beanMap.put(clazz, instance);
+      return instance;
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new RuntimeException(e);
     }
   }
 
